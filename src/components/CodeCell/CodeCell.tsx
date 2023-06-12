@@ -1,18 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { bundle } from "../../bundler";
 import { CodeEditor } from "../CodeEditor";
 import { Preview } from "../Preview";
-import { Button } from "../Button";
 import { Resizable } from "../Resizable";
 
 const CodeCell: React.FC = (): JSX.Element => {
   const [code, setCode] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [input, setInput] = useState<string>("");
 
-  const onClick = async () => {
-    const output = await bundle(input);
-    setCode(output);
-  };
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const output = await bundle(input);
+      setCode(output.code);
+      setError(output.error);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [input]);
 
   return (
     <Resizable direction="vertical">
@@ -23,10 +30,7 @@ const CodeCell: React.FC = (): JSX.Element => {
             onChange={(value) => setInput(value)}
           />
         </Resizable>
-        {/* <div>
-          <Button onClick={onClick}>Submit</Button>
-        </div> */}
-        <Preview code={code} />
+        <Preview code={code} err={error} />
       </div>
     </Resizable>
   );

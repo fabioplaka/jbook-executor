@@ -3,6 +3,7 @@ import { FC, useEffect, useRef } from "react";
 
 interface PreviewProps {
   code: string;
+  err: string;
 }
 
 const html = `
@@ -14,13 +15,22 @@ const html = `
     <div id="root">
     </div>
     <script>
+      const handleError = (error) => {
+        const root = document.querySelector('#root');
+        root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + error + '</div>'
+        console.error(error);
+      }
+
+      window.addEventListener('error', (event) => {
+        event.preventDefault();
+        handleError(event.error);
+      })
+
       window.addEventListener('message', (e) => {
         try {
           eval(event.data);
         } catch (error) {
-          const root = document.querySelector('#root');
-          root.innerHTML = '<div style="color: red;"><h4>Runtime Error</h4>' + error + '</div>'
-          console.error(error);
+          handleError(error);
         }
       }, false);
     </script>
@@ -28,12 +38,14 @@ const html = `
 </html>
 `;
 
-const Preview: FC<PreviewProps> = ({ code }) => {
+const Preview: FC<PreviewProps> = ({ code, err }) => {
   const iframe = useRef<any>();
 
   useEffect(() => {
     iframe.current.srcdoc = html;
-    iframe.current.contentWindow.postMessage(code, "*");
+    setTimeout(() => {
+      iframe.current.contentWindow.postMessage(code, "*");
+    }, 50);
   }, [code]);
 
   return (
@@ -44,6 +56,7 @@ const Preview: FC<PreviewProps> = ({ code }) => {
         sandbox="allow-scripts"
         srcDoc={html}
       />
+      {err && <div className="preview-error">{err}</div>}
     </div>
   );
 };
