@@ -1,7 +1,7 @@
-import React from "react";
+import { FC } from "react";
 import { CodeCell } from "./components/CodeCell";
 
-const App: React.FC = (): JSX.Element => {
+const App: FC = (): JSX.Element => {
   return (
     <div>
       <CodeCell />
