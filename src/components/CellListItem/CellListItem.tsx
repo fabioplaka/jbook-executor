@@ -1,7 +1,9 @@
+import "./CellListItem.css";
 import { FC } from "react";
 import { CellType } from "../../types/CellTypes";
 import { CodeCell } from "../CodeCell";
 import { TextEditor } from "../TextEditor";
+import { ActionBar } from "../ActionBar";
 
 type CellListItemProps = {
   cell: CellType;
@@ -10,11 +12,23 @@ type CellListItemProps = {
 const CellListItem: FC<CellListItemProps> = ({ cell }): JSX.Element => {
   let child: JSX.Element;
   if (cell.type === "code") {
-    child = <CodeCell cell={cell} />;
+    child = (
+      <>
+        <div className="action-bar-wrapper">
+          <ActionBar id={cell.id} />
+        </div>
+        <CodeCell cell={cell} />
+      </>
+    );
   } else {
-    child = <TextEditor cell={cell} />;
+    child = (
+      <>
+        <TextEditor cell={cell} />
+        <ActionBar id={cell.id} />
+      </>
+    );
   }
-  return <div>{child}</div>;
+  return <div className="cell-list-item">{child}</div>;
 };
 
 export default CellListItem;
